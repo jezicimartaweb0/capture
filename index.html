@@ -63,8 +63,10 @@
             padding: 12px 30px;
             font-size: 16px;
             font-weight: bold;
-            text-decoration: none;
+            border: none;
             border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
             transition: background-color 0.2s ease;
         }
         .btn:hover {
@@ -79,7 +81,7 @@
         <img src="logo.PNG" alt="Hotel Frankopan Logo">
     </div>
 
-    <!-- Središnji dio s tekstom i gumbom -->
+    <!-- Središnji dio s tekstom i formom -->
     <div class="container">
         <div class="text-hr">
             Dobrodošli! Spajanjem na mrežu prihvaćate uvjete korištenja Wi-Fi hotela Frankopan i obvezujete se koristiti ga u zakonite svrhe. Hotel ne snosi odgovornost za sadržaj niti sigurnost podataka koje prenosite.
@@ -91,8 +93,33 @@
             Welcome! You accept the terms of use of the Hotel Frankopan Wi-Fi and agree to use it for lawful purposes only. The hotel accepts no responsibility for the content you access or the security of the data you transfer.
         </div>
 
-        <a href="https://hotel-frankopan.com/" class="btn">Nastavi / Continue</a>
+        <!-- FortiGate forma umjesto običnog linka -->
+        <form id="captive-form" method="POST">
+            <!-- Skriveno polje za povratnu adresu (redir) koje popunjava skripta -->
+            <input type="hidden" name="redir" id="redir-field">
+            
+            <!-- Gumb koji glumi submit forme -->
+            <button type="submit" class="btn">Nastavi / Continue</button>
+        </form>
     </div>
+
+    <script>
+        // Automatski hvata parametre (gateway, port, redir) koje pošalje FortiGate
+        const urlParams = new URLSearchParams(window.location.search);
+        const gateway = urlParams.get('gateway');
+        const port = urlParams.get('port') || '1000';
+        const redir = urlParams.get('redir');
+
+        // Dinamički postavlja odredište forme (action) prema IP adresi tvog FortiGate sučelja
+        if (gateway) {
+            document.getElementById('captive-form').action = `https://${gateway}:${port}/fgtauth`;
+        }
+
+        // Vraća korisnika na originalnu stranicu (ili željeni URL) nakon uspješnog klika
+        if (redir) {
+            document.getElementById('redir-field').value = redir;
+        }
+    </script>
 
 </body>
 </html>
